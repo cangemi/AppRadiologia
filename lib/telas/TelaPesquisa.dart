@@ -1,9 +1,8 @@
 import 'dart:ui';
 
-import 'package:app_radiologia/FirestoreConn.dart';
+//import 'package:app_radiologia/FirestoreConn.dart';
 import 'package:app_radiologia/model/Exame.dart';
 import 'package:app_radiologia/widgets/CustomAlertDialog.dart';
-import 'package:app_radiologia/widgets/CustomDropdown.dart';
 import 'package:app_radiologia/widgets/TextFieldSuggestions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,96 +19,140 @@ class TelaPesquisa extends StatefulWidget {
 
 class _TelaPesquisaState extends State<TelaPesquisa> {
   QuerySnapshot querySnapshot;
-  String _primeiroSintoma;
-  String _segundoSintoma;
-  String _primeiroSinal;
-  String _segundoSinal;
   String _hintSintoma = "Escolha um sintoma";
-  String _hintSinal = "Escolha um sinal      ";
+
+  CollectionReference sintomas;
+
+  TextEditingController _primeiroSintomaController = TextEditingController();
+  CollectionReference primeiroSintomas;
+  String _primeiroSintoma = "";
+  List<String> _listaSintomaPrincipal = [];
+
+  TextEditingController _segundoSintomaController = TextEditingController();
+  CollectionReference segundoSintomas;
+  String _segundoSintoma = "";
+  List<String> _listaSintomaSecundario = [];
+
+  TextEditingController _sinalController = TextEditingController();
+  CollectionReference sinais;
+  String _sinal = "";
+  List<String> _listaSinais = [];
+  String _hintSinal = "Escolha um sinal";
+
+  TextEditingController _diagnosticoController = TextEditingController();
+  CollectionReference diagnosticos;
+  String _hipoteseDiagnostica = "";
+  List<String> _listaDiagnosticos = [];
+  String _hintDiagnostico = "Hipotese Diagnostica";
+
   Query exameList;
   CollectionReference exames;
-  CollectionReference sinais;
+  Query listTeste;
   List<Exame> exList = [];
 
-  List _listaSintomaPrincipal = ["Escolha um sintoma"];
-  List _listaSintomaSecundario = ["Escolha um sintoma"];
-  List _listaSinais = ["Escolha um sinal      "];
+  //FirestoreConn firestoreConn = FirestoreConn();
+  //FirebaseFirestore db = FirebaseFirestore.instance;
 
-  FirestoreConn firestoreConn = FirestoreConn();
-  FirebaseFirestore db = FirebaseFirestore.instance;
+  message(String text) {
+    final snackBar = SnackBar(
+      backgroundColor: Colors.white,
+      shape: Border(top: BorderSide(color: Colors.blue, width: 3)),
+      content: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.black, fontSize: 16),
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 
   void _busca() {
     exList = [];
     exameList = null;
-    if (_primeiroSintoma != _hintSintoma &&
-        _segundoSintoma != _hintSintoma &&
-        _primeiroSinal != _hintSinal &&
-        _segundoSinal != _hintSinal) {
+
+    try {
+      print("primeira Pesquisa");
       exameList = exames
           .where("sintoma.$_primeiroSintoma", isEqualTo: true)
           .where("sintoma.$_segundoSintoma", isEqualTo: true)
-          .where("sinais.$_primeiroSinal", isEqualTo: true)
-          .where("sinais.$_segundoSinal", isEqualTo: true);
-    } else {
-      if (_primeiroSintoma != _hintSintoma &&
-          _segundoSintoma != _hintSintoma &&
-          _primeiroSinal != _hintSinal) {
+          .where("sinais.$_sinal", isEqualTo: true)
+          .where("diagnostico.$_hipoteseDiagnostica", isEqualTo: true);
+    } catch (_) {
+      try {
+        print("segunda Pesquisa");
         exameList = exames
             .where("sintoma.$_primeiroSintoma", isEqualTo: true)
             .where("sintoma.$_segundoSintoma", isEqualTo: true)
-            .where("sinais.$_primeiroSinal", isEqualTo: true);
-      } else {
-        if (_primeiroSintoma != _hintSintoma &&
-            _segundoSintoma != _hintSintoma &&
-            _segundoSinal != _hintSinal) {
+            .where("sinais.$_sinal", isEqualTo: true);
+      } catch (_) {
+        try {
+          print("terceira Pesquisa");
           exameList = exames
               .where("sintoma.$_primeiroSintoma", isEqualTo: true)
               .where("sintoma.$_segundoSintoma", isEqualTo: true)
-              .where("sinais.$_segundoSinal", isEqualTo: true);
-        } else {
-          if (_primeiroSintoma != _hintSintoma &&
-              _segundoSintoma != _hintSintoma) {
+              .where("diagnostico.$_hipoteseDiagnostica", isEqualTo: true);
+        } catch (_) {
+          try {
+            print("quarta Pesquisa");
             exameList = exames
                 .where("sintoma.$_primeiroSintoma", isEqualTo: true)
                 .where("sintoma.$_segundoSintoma", isEqualTo: true);
-          } else {
-            if (_primeiroSintoma != _hintSintoma &&
-                _primeiroSinal != _hintSinal) {
+          } catch (_) {
+            try {
+              print("quinta Pesquisa");
               exameList = exames
                   .where("sintoma.$_primeiroSintoma", isEqualTo: true)
-                  .where("sinais.$_primeiroSinal", isEqualTo: true);
-            } else {
-              if (_primeiroSintoma != _hintSintoma &&
-                  _segundoSinal != _hintSinal) {
-                print("entrou here");
-                print(_primeiroSintoma);
-                print(_segundoSinal);
+                  .where("sinais.$_sinal", isEqualTo: true);
+            } catch (_) {
+              try {
+                print("sexta Pesquisa");
                 exameList = exames
                     .where("sintoma.$_primeiroSintoma", isEqualTo: true)
-                    .where("sinais.$_segundoSinal", isEqualTo: true);
-              } else {
-                if (_segundoSintoma != _hintSintoma &&
-                    _primeiroSinal != _hintSinal) {
+                    .where("diagnostico.$_hipoteseDiagnostica",
+                        isEqualTo: true);
+              } catch (_) {
+                try {
+                  print("setima Pesquisa");
                   exameList = exames
                       .where("sintoma.$_segundoSintoma", isEqualTo: true)
-                      .where("sinais.$_primeiroSinal", isEqualTo: true);
-                } else {
-                  if (_segundoSintoma != _hintSintoma &&
-                      _segundoSinal != _hintSinal) {
+                      .where("sinais.$_sinal", isEqualTo: true);
+                } catch (_) {
+                  try {
+                    print("oitava Pesquisa");
                     exameList = exames
                         .where("sintoma.$_segundoSintoma", isEqualTo: true)
-                        .where("sinais.$_segundoSinal", isEqualTo: true);
-                  } else {
-                    if (_primeiroSintoma != _hintSintoma) {
-                      exameList = exames.where("sintoma.$_primeiroSintoma",
-                          isEqualTo: true);
-                    } else {
-                      if (_segundoSintoma != _hintSintoma) {
-                        exameList = exames.where("sintoma.$_segundoSintoma",
+                        .where("diagnostico.$_hipoteseDiagnostica",
                             isEqualTo: true);
-                      } else {
-                        print("não entrou em nenhum");
-                        exameList = null;
+                  } catch (_) {
+                    try {
+                      exameList = exames
+                          .where("sinais.$_sinal", isEqualTo: true)
+                          .where("diagnostico.$_hipoteseDiagnostica",
+                              isEqualTo: true);
+                    } catch (_) {
+                      try {
+                        print("nona Pesquisa");
+                        exameList = exames.where("sintoma.$_primeiroSintoma",
+                            isEqualTo: true);
+                      } catch (_) {
+                        try {
+                          print("decima Pesquisa");
+                          exameList = exames.where("sintoma.$_segundoSintoma",
+                              isEqualTo: true);
+                        } catch (_) {
+                          try {
+                            print("decima primeira Pesquisa");
+                            exameList =
+                                exames.where("sinais.$_sinal", isEqualTo: true);
+                          } catch (_) {
+                            try {
+                              print("decima segunda Pesquisa");
+                              exameList = exames.where(
+                                  "diagnostico.$_hipoteseDiagnostica",
+                                  isEqualTo: true);
+                            } catch (_) {}
+                          }
+                        }
                       }
                     }
                   }
@@ -123,91 +166,87 @@ class _TelaPesquisaState extends State<TelaPesquisa> {
   }
 
   void _pesquisa() async {
-    _busca();
-    querySnapshot = await exameList.get();
-    for (DocumentSnapshot ex in querySnapshot.docs) {
-      exList.add(Exame.fromJson(ex.data(), ex.id));
-    }
-    if (querySnapshot.size > 1) {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return CustomAlertDialog(
-                text: "Possiveis exames",
-                query: exameList,
-                title: (Exame e) {
-                  return e.nome;
-                },
-                onTap: (Exame e) {
-                  Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PagExame(exame: e)))
-                      .then((value) => Navigator.pop(this.context));
-                });
-          });
+    if (_primeiroSintoma == "" &&
+        _segundoSintoma == "" &&
+        _sinal == "" &&
+        _hipoteseDiagnostica == "") {
+      message("Preencha um dos campos para pesquisar");
     } else {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => PagExame(exame: exList[0])));
+      _busca();
+      try {
+        querySnapshot = await exameList.get();
+        for (DocumentSnapshot ex in querySnapshot.docs) {
+          exList.add(Exame.fromJson(ex.data(), ex.id));
+        }
+        if(exList[0].nome.isNotEmpty){
+          if (exList.length > 1) {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return CustomAlertDialog(
+                      text: "Possiveis exames",
+                      query: exameList,
+                      title: (Exame e) {
+                        return e.nome;
+                      },
+                      onTap: (Exame e) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PagExame(exame: e)))
+                            .then((value) => Navigator.pop(this.context));
+                      });
+                });
+          } else {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => PagExame(exame: exList[0])));
+          }
+        }else{
+          message("Nenhum exame encontado");
+        }
+      } catch (_){
+        message("Nenhum exame encontado");
+      }
+    }
+  }
+
+  funcao(Function f) async {
+    QuerySnapshot qS = await listTeste.get();
+    for (DocumentSnapshot ex in qS.docs) {
+      var dado = ex;
+      f(dado);
     }
   }
 
 //-------------------------------------------------------------------------------
-  List<String> listaSinal = [];
-
   @override
   void initState() {
     super.initState();
     //  --------------------
     exames = FirebaseFirestore.instance.collection("exames");
     sinais = FirebaseFirestore.instance.collection("sinais");
+    sintomas = FirebaseFirestore.instance.collection("sintomas");
+    diagnosticos = FirebaseFirestore.instance.collection("hipoteseDiagnostica");
+    primeiroSintomas =
+        FirebaseFirestore.instance.collection("sintomaPrincipal");
+    segundoSintomas =
+        FirebaseFirestore.instance.collection("sintomaSecundario");
 
     //  ----------------
-    firestoreConn.lista((DocumentSnapshot s) {
-      setState(() {
-        if (!_listaSintomaPrincipal.contains(s["sintoma"])) {
-          _listaSintomaPrincipal.add(s["sintoma"]);
-        }
-      });
-    }, "sintomaPrincipal");
-    firestoreConn.lista((DocumentSnapshot s) {
-      setState(() {
-        if (!_listaSintomaSecundario.contains(s["sintoma"])) {
-          _listaSintomaSecundario.add(s["sintoma"]);
-        }
-      });
-    }, "sintomaSecundario");
-    firestoreConn.lista((DocumentSnapshot s) {
-      setState(() {
-        if (!_listaSinais.contains(s["sinal"])) {
-          _listaSinais.add(s["sinal"]);
-          listaSinal.add(s["sinal"]);
-        }
-      });
-    }, "sinais");
-    _primeiroSintoma = _listaSintomaPrincipal[0];
-    _segundoSintoma = _listaSintomaSecundario[0];
-    _primeiroSinal = _listaSinais[0];
-    _segundoSinal = _listaSinais[0];
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _primeiroSintomaController.dispose();
+    _segundoSintomaController.dispose();
+    _sinalController.dispose();
+    _diagnosticoController.dispose();
   }
 
   //------------------------------------------------------------------------
-  TextEditingController textEditingController = TextEditingController();
-  Query listTeste;
-  List<String> listaSinal2 = [];
-
-  funcao() async {
-    QuerySnapshot qS = await listTeste.get();
-    for (DocumentSnapshot ex in qS.docs) {
-      var dado = ex;
-      setState(() {
-        print(dado["sinal"]);
-        if (!listaSinal2.contains(dado["sinal"])) {
-          listaSinal2.add(dado["sinal"]);
-        }
-      });
-    }
-  }
 
   //-------------------------------------------------------------------------
   @override
@@ -223,67 +262,151 @@ class _TelaPesquisaState extends State<TelaPesquisa> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
-          CustomDropdown(
-              value: _primeiroSintoma,
-              textHint: "escolha um sintoma",
-              onChanged: (newValue) {
-                setState(() {
-                  _primeiroSintoma = newValue;
-                });
-              },
-              list: _listaSintomaPrincipal),
-          CustomDropdown(
-              value: _segundoSintoma,
-              textHint: "escolha um sintoma",
-              onChanged: (newValue) {
-                setState(() {
-                  _segundoSintoma = newValue;
-                });
-              },
-              list: _listaSintomaSecundario),
-          CustomDropdown(
-              value: _primeiroSinal,
-              textHint: "escolha um sintoma",
-              onChanged: (newValue) {
-                setState(() {
-                  _primeiroSinal = newValue;
-                });
-              },
-              list: _listaSinais),
-          // CustomDropdown(
-          //     value: _segundoSinal,
-          //     textHint: "escolha um sintoma",
-          //     onChanged: (newValue) {
-          //       setState(() {
-          //         _segundoSinal = newValue;
-          //       });
-          //     },
-          //     list: _listaSinais),
           TextFieldSuggestions(
-            controller: textEditingController,
-            list: listaSinal2,
-            labelText: 'Segundo sinal',
+            controller: _primeiroSintomaController,
+            list: _listaSintomaPrincipal,
+            labelText: _hintSintoma,
             textSuggetionsColor: Colors.white,
             outlineInputBorderColor: Colors.blue,
             suggetionsBackgroundColor: Colors.blue,
-            returnedValue: (String value)=> _segundoSinal = value,
+            returnedValue: (String value) => _primeiroSintoma = value,
             onChange: (String value) {
               if (value == "") {
                 setState(() {
-                  listaSinal2 = [];
+                  _listaSintomaPrincipal = [];
+                  _primeiroSintoma = "";
                 });
               } else {
                 setState(() {
-                  listaSinal2 = [];
+                  _listaSintomaPrincipal = [];
                 });
-                String capitalize =
-                    value[0].toUpperCase() + value.substring(1).toLowerCase();
-                listTeste = sinais
-                    .where("sinal", isGreaterThanOrEqualTo: capitalize)
-                    .where("sinal", isLessThanOrEqualTo: capitalize + "\uf8ff");
-                funcao();
+                String texto = value.toLowerCase();
+                listTeste = sintomas
+                    .where("sintoma", isGreaterThanOrEqualTo: texto)
+                    .where("sintoma", isLessThanOrEqualTo: texto + "\uf8ff");
+
+                funcao((DocumentSnapshot dado) {
+                  setState(() {
+                    print(dado["sintoma"]);
+                    if (!_listaSintomaPrincipal.contains(dado["sintoma"])) {
+                      _listaSintomaPrincipal.add(dado["sintoma"]);
+                    }
+                  });
+                });
               }
             },
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          TextFieldSuggestions(
+            controller: _segundoSintomaController,
+            list: _listaSintomaSecundario,
+            labelText: _hintSintoma,
+            textSuggetionsColor: Colors.white,
+            outlineInputBorderColor: Colors.blue,
+            suggetionsBackgroundColor: Colors.blue,
+            returnedValue: (String value) => _segundoSintoma = value,
+            onChange: (String value) {
+              if (value == "") {
+                setState(() {
+                  _listaSintomaSecundario = [];
+                  _segundoSintoma = "";
+                });
+              } else {
+                setState(() {
+                  _listaSintomaSecundario = [];
+                });
+                String texto = value.toLowerCase();
+                listTeste = sintomas
+                    .where("sintoma", isGreaterThanOrEqualTo: texto)
+                    .where("sintoma", isLessThanOrEqualTo: texto + "\uf8ff");
+                funcao((DocumentSnapshot dado) {
+                  setState(() {
+                    print(dado["sintoma"]);
+                    if (!_listaSintomaSecundario.contains(dado["sintoma"])) {
+                      _listaSintomaSecundario.add(dado["sintoma"]);
+                    }
+                  });
+                });
+              }
+            },
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          TextFieldSuggestions(
+            controller: _sinalController,
+            list: _listaSinais,
+            labelText: _hintSinal,
+            textSuggetionsColor: Colors.white,
+            outlineInputBorderColor: Colors.blue,
+            suggetionsBackgroundColor: Colors.blue,
+            returnedValue: (String value) => _sinal = value,
+            onChange: (String value) {
+              if (value == "") {
+                setState(() {
+                  _listaSinais = [];
+                  _sinal = "";
+                });
+              } else {
+                setState(() {
+                  _listaSinais = [];
+                });
+                String texto = value.toLowerCase();
+                listTeste = sinais
+                    .where("sinal", isGreaterThanOrEqualTo: texto)
+                    .where("sinal", isLessThanOrEqualTo: texto + "\uf8ff");
+                funcao((DocumentSnapshot dado) {
+                  setState(() {
+                    print(dado["sinal"]);
+                    if (!_listaSinais.contains(dado["sinal"])) {
+                      _listaSinais.add(dado["sinal"]);
+                    }
+                  });
+                });
+              }
+            },
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          TextFieldSuggestions(
+            controller: _diagnosticoController,
+            list: _listaDiagnosticos,
+            labelText: _hintDiagnostico,
+            textSuggetionsColor: Colors.white,
+            outlineInputBorderColor: Colors.blue,
+            suggetionsBackgroundColor: Colors.blue,
+            returnedValue: (String value) => _hipoteseDiagnostica = value,
+            onChange: (String value) {
+              if (value == "") {
+                setState(() {
+                  _listaDiagnosticos = [];
+                  _hipoteseDiagnostica = "";
+                });
+              } else {
+                setState(() {
+                  _listaDiagnosticos = [];
+                });
+                String texto = value.toLowerCase();
+                listTeste = diagnosticos
+                    .where("diagnostico", isGreaterThanOrEqualTo: texto)
+                    .where("diagnostico",
+                        isLessThanOrEqualTo: texto + "\uf8ff");
+                funcao((DocumentSnapshot dado) {
+                  setState(() {
+                    print(dado["diagnostico"]);
+                    if (!_listaDiagnosticos.contains(dado["diagnostico"])) {
+                      _listaDiagnosticos.add(dado["diagnostico"]);
+                    }
+                  });
+                });
+              }
+            },
+          ),
+          SizedBox(
+            height: 20,
           ),
           TextButton(
               onPressed: () {

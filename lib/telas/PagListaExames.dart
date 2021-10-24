@@ -17,34 +17,26 @@ class PagListaExames extends StatefulWidget {
 }
 
 class _PagListaExamesState extends State<PagListaExames> {
-  List _list = [];
-  List<Exame> exList = [];
 
-  void _carregarExames() {
-    for (int i = 0; i <= 29; i++) {
-      Map<String, dynamic> exames = Map();
-      exames["titulo"] = "Exame ${i + 1}";
-      _list.add(exames);
-    }
-  }
-   void _carregar()async{
-     QuerySnapshot querySnapshot = await widget.exames.get();
-     for (DocumentSnapshot ex in querySnapshot.docs) {
-       setState(() {
-         exList.add(Exame.fromJson(ex.data(), ex.id));
-       });
-     }
-   }
-
-  @override
-  void initState() {
-    super.initState();
-    _carregar();
+  Widget itemLista(item){
+    Exame e = Exame.fromJson(item.data(), item.id);
+    return Padding(
+      padding: EdgeInsets.only(left: 6, bottom: 20, top: 10),
+      child: ListTile(
+          title: Text(
+            e.nome,
+            style: TextStyle(fontSize: 18),
+          ),
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => PagExame(exame: e)));
+          }
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    _carregarExames();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -62,30 +54,36 @@ class _PagListaExamesState extends State<PagListaExames> {
           ],
         ),
       ),
-      body: Container(
-          margin: EdgeInsets.all(10),
-          decoration: BoxDecoration(
-              border: Border.all(color: Colors.blue),
-              borderRadius: BorderRadius.circular(10)),
-          padding: EdgeInsets.all(20),
-        child: ListView.separated(
+      body: StreamBuilder(
+        stream: widget.exames.snapshots(),
+          builder: (context, snapshot){
+    switch (snapshot.connectionState){
+      case ConnectionState.none:
+        return Center(child: Text('Erro ao conectar no Firebase'));
+      case ConnectionState.waiting:
+        return Center(child: CircularProgressIndicator());
+      default:
+        final dados = snapshot.requireData;
+        return Container(
+            margin: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+            border: Border.all(color: Colors.blue),
+            borderRadius: BorderRadius.circular(10)),
+            padding: EdgeInsets.all(20),
+            child: ListView.separated(
             padding: EdgeInsets.only(right: 20,left: 20),
-            itemCount: _list.length,//exList.length,
+            itemCount: dados.size,
             separatorBuilder: (contex, index) => Divider(
-              height: 3,
-              color: Colors.blue,
+            height: 3,
+            color: Colors.blue,
             ),
-            itemBuilder: (context, index) => Padding(
-                padding: EdgeInsets.only(left: 6, bottom: 20, top: 10),
-                child: ListTile(
-                    title: Text(
-                      _list[index]["titulo"],//exList[index].nome,
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => PagExame()));
-                    }))),
+            itemBuilder: (context, index){
+              return itemLista(dados.docs[index]);
+            }
+            )
+        );
+    }
+          }
       )
     );
   }

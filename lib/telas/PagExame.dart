@@ -27,9 +27,14 @@ class _PagExameState extends State<PagExame> {
         child: Column(
           children: [
             Center(
-              child: Text(
-                "Código do SUS: " + widget.exame.cod_sus,
-                style: TextStyle(fontSize: 20),
+              child: widget.exame.cod_sus == null
+                  ? Container()
+                  :Padding(
+                  padding: EdgeInsets.only(bottom: 10),
+                child: Text(
+                  "Código do SUS: " + widget.exame.cod_sus,
+                  style: TextStyle(fontSize: 20),
+                ),
               ),
             ),
             Container(
@@ -60,7 +65,7 @@ class _PagExameState extends State<PagExame> {
                     ),
                   )),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 widget.exame.prioridades == null
                     ? Container()
@@ -70,7 +75,10 @@ class _PagExameState extends State<PagExame> {
                     : buildContainer("Notas", widget.exame.notas),
                 widget.exame.indicacao == null
                     ? Container()
-                    : buildContainer("Indicação", widget.exame.indicacao)
+                    :widget.exame.descricao == null?
+                    Container():
+                    buildContainer("Indicação", widget.exame.indicacao)
+
               ],
             )
           ],
@@ -85,6 +93,7 @@ class _PagExameState extends State<PagExame> {
           border: Border.all(color: Colors.blue),
         ),
         padding: EdgeInsets.only(left: 5, right: 5),
+        margin: EdgeInsets.only(left: 2, right: 2),
         child: TextButton(
           onPressed: () {
             telaContainer(text, list);
@@ -110,17 +119,17 @@ class _PagExameState extends State<PagExame> {
               style: TextStyle(color: Colors.white),
             ),
             content: ListView.separated(
-                  separatorBuilder: (contex, index) => Divider(
-                    height: 3,
-                    color: Colors.white,
-                  ),
-                  itemCount: list.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(list[index],
-                          style: TextStyle(color: Colors.white)),
-                    );
-                  }),
+                separatorBuilder: (contex, index) => Divider(
+                  height: 3,
+                  color: Colors.white,
+                ),
+                itemCount: list.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(list[index],
+                        style: TextStyle(color: Colors.white)),
+                  );
+                }),
             actions: [
               TextButton(
                   onPressed: () => Navigator.pop(context),

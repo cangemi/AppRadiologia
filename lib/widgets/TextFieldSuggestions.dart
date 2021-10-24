@@ -9,29 +9,35 @@ class TextFieldSuggestions extends StatefulWidget {
   final Color textSuggetionsColor;
   final Color suggetionsBackgroundColor;
   final Color outlineInputBorderColor;
-  const TextFieldSuggestions({
-    Key key,
-    this.list,
-    this.controller,
-    this.onChange,
-    this.labelText,
-    this.textSuggetionsColor,
-    this.suggetionsBackgroundColor,
-    this.outlineInputBorderColor,
-    this.returnedValue
-  }) : super(key: key);
+  const TextFieldSuggestions(
+      {Key key,
+      this.list,
+      this.controller,
+      this.onChange,
+      this.labelText,
+      this.textSuggetionsColor,
+      this.suggetionsBackgroundColor,
+      this.outlineInputBorderColor,
+      this.returnedValue})
+      : super(key: key);
 
   @override
   _TextFieldSuggestionsState createState() => _TextFieldSuggestionsState();
 }
 
 class _TextFieldSuggestionsState extends State<TextFieldSuggestions> {
+  String Captalize(String text) {
+    String textCapitalized =
+        text[0].toUpperCase() + text.substring(1).toLowerCase();
+    return textCapitalized;
+  }
+
   @override
   void dispose() {
     super.dispose();
     widget.list.clear();
   }
-  @override
+
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(
@@ -48,11 +54,16 @@ class _TextFieldSuggestionsState extends State<TextFieldSuggestions> {
             scrollPadding: EdgeInsets.only(bottom: 100),
             controller: widget.controller,
             onChanged: widget.onChange,
-            onSubmitted: (String value){
-              if(value!=""){
+            onSubmitted: (String value) {
+              if (value != "") {
                 setState(() {
-                  widget.controller.text = widget.list[0];
+                  widget.controller.text = Captalize(widget.list[0]);
                   widget.list.clear();
+                });
+                widget.returnedValue(widget.controller.text.toLowerCase());
+              } else {
+                setState(() {
+                  widget.controller.text = "";
                 });
                 widget.returnedValue(widget.controller.text);
               }
@@ -61,28 +72,31 @@ class _TextFieldSuggestionsState extends State<TextFieldSuggestions> {
           widget.list.length == 0
               ? Container()
               : Container(
-            margin: EdgeInsets.only(top: 3),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                color: widget.suggetionsBackgroundColor),
-            child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: widget.list.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(widget.list[index],
-                        style: TextStyle(color: widget.textSuggetionsColor)),
-                    onTap: () {
-                      setState(() {
-                        widget.controller.text =
-                        widget.list[index];
-                        widget.list.clear();
-                      });
-                      widget.returnedValue(widget.controller.text);
-                    },
-                  );
-                }),
-          ),
+                  margin: EdgeInsets.only(top: 3),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: widget.suggetionsBackgroundColor),
+                  child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: widget.list.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(Captalize(widget.list[index]),
+                              style:
+                                  TextStyle(color: widget.textSuggetionsColor)),
+                          onTap: () {
+                            setState(() {
+                              widget.controller.text =
+                                  Captalize(widget.list[index]);
+                              widget.list.clear();
+                            });
+                            widget.returnedValue(
+                                widget.controller.text.toLowerCase());
+                            FocusScope.of(context).unfocus();
+                          },
+                        );
+                      }),
+                ),
         ],
       ),
     );

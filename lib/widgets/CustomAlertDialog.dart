@@ -56,9 +56,9 @@ class _CustomAlertDialogState extends State<CustomAlertDialog> {
               ),
               content: Container(
                 decoration:
-                    BoxDecoration(borderRadius: BorderRadius.circular(10)),
-                height: widget.height,
-                width: widget.width,
+                BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                // height: widget.height,
+                // width: widget.width,
                 child: ListView.builder(
                   shrinkWrap: true,
                   itemCount: dados.size,

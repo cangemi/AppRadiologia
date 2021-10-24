@@ -2,7 +2,7 @@ class Exame{
   String id;
   String nome;
   String cod_sus;
-  String parte_corpo;
+  List parte_corpo;
   List descricao;
   List indicacao;
   List notas;

@@ -1,3 +1,4 @@
+import 'package:app_radiologia/myicons_icons.dart';
 import 'package:app_radiologia/telas/PagListaExames.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -35,12 +36,14 @@ class _TelaExamesState extends State<TelaExames> {
       crossAxisSpacing: 2,
       childAspectRatio: MediaQuery.of(context).size.aspectRatio * 1.9,
       children: <Widget>[
-        customBuildGestureDetector(Icons.ac_unit,"Sistema Reprodutor Feminino"),
-        customBuildGestureDetector(Icons.height,"Sistema Reprodutor Feminino"),
-        customBuildGestureDetector(Icons.cabin,"Parte do corpo"),
-        customBuildGestureDetector(Icons.list,"Parte do corpo"),
-        customBuildGestureDetector(Icons.access_alarm_sharp,"Parte do corpo"),
-        customBuildGestureDetector(Icons.accessibility_new,"Parte do corpo"),
+        customBuildGestureDetector(Myicons.woman,"Saúde da Mulher"),
+        customBuildGestureDetector(Myicons.man,"Saúde do Homem"),
+        customBuildGestureDetector(Myicons.eye_recognition,"Olhos"),
+        customBuildGestureDetector(Myicons.abdomen,"Abdômen"),
+        customBuildGestureDetector(Myicons.pele_seca,"Pele"),
+        customBuildGestureDetector(Myicons.veias,"Vasos"),
+        customBuildGestureDetector(Myicons.trato_urinario,"Trato urinário"),
+        customBuildGestureDetector(Myicons.pediatria,"Pediatria"),
       ],
     );
   }
@@ -48,7 +51,7 @@ class _TelaExamesState extends State<TelaExames> {
   GestureDetector customBuildGestureDetector(IconData icon, String text) {
     return GestureDetector(
         onTap: (){
-          exameList = exames.where("parte_corpo",isEqualTo: text);
+          exameList = exames.where("parte_corpo",arrayContains: text);
           _nextPag(icon,text,exameList);
         },
         child: Container(
