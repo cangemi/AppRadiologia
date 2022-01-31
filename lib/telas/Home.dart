@@ -1,10 +1,7 @@
-import 'package:app_radiologia/model/Exame.dart';
 import 'package:app_radiologia/telas/TelaExames.dart';
 import 'package:app_radiologia/telas/TelaPesquisa.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '../FirestoreConn.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -13,7 +10,6 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   TabController _tabController;
-  FirestoreConn firestoreConn = FirestoreConn();
 
   @override
   void initState() {

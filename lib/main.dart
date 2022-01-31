@@ -10,5 +10,5 @@ void main() async {
 
   final aceiteSave = await SharedPreferences.getInstance();
   bool aceite = await aceiteSave.getBool("aceite");
-  runApp(MaterialApp(home: aceite == true ? Home() : TelaTermo()));
+  runApp(MaterialApp(home: aceite == false|| aceite == null ? Home():TelaTermo()));
 }

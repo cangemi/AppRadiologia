@@ -24,7 +24,7 @@ class _TelaTermoState extends State<TelaTermo> {
 
   saveValue() async {
     final aceiteSave = await SharedPreferences.getInstance();
-    await aceiteSave.setBool("aceite", true);
+    await aceiteSave.setBool("aceite", false);
   }
 
   recuperarTermo() async {

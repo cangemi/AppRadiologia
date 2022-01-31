@@ -69,99 +69,78 @@ class _TelaPesquisaState extends State<TelaPesquisa> {
   void _busca() {
     exList = [];
     exameList = null;
-
-    try {
+    if(_primeiroSintoma.isNotEmpty&&_segundoSintoma.isNotEmpty
+        &&_sinal.isNotEmpty&&_hipoteseDiagnostica.isNotEmpty){
       print("primeira Pesquisa");
       exameList = exames
           .where("sintoma.$_primeiroSintoma", isEqualTo: true)
           .where("sintoma.$_segundoSintoma", isEqualTo: true)
           .where("sinais.$_sinal", isEqualTo: true)
           .where("diagnostico.$_hipoteseDiagnostica", isEqualTo: true);
-    } catch (_) {
-      try {
-        print("segunda Pesquisa");
-        exameList = exames
-            .where("sintoma.$_primeiroSintoma", isEqualTo: true)
-            .where("sintoma.$_segundoSintoma", isEqualTo: true)
-            .where("sinais.$_sinal", isEqualTo: true);
-      } catch (_) {
-        try {
-          print("terceira Pesquisa");
-          exameList = exames
-              .where("sintoma.$_primeiroSintoma", isEqualTo: true)
-              .where("sintoma.$_segundoSintoma", isEqualTo: true)
-              .where("diagnostico.$_hipoteseDiagnostica", isEqualTo: true);
-        } catch (_) {
-          try {
-            print("quarta Pesquisa");
-            exameList = exames
-                .where("sintoma.$_primeiroSintoma", isEqualTo: true)
-                .where("sintoma.$_segundoSintoma", isEqualTo: true);
-          } catch (_) {
-            try {
-              print("quinta Pesquisa");
-              exameList = exames
-                  .where("sintoma.$_primeiroSintoma", isEqualTo: true)
-                  .where("sinais.$_sinal", isEqualTo: true);
-            } catch (_) {
-              try {
-                print("sexta Pesquisa");
-                exameList = exames
-                    .where("sintoma.$_primeiroSintoma", isEqualTo: true)
-                    .where("diagnostico.$_hipoteseDiagnostica",
-                        isEqualTo: true);
-              } catch (_) {
-                try {
-                  print("setima Pesquisa");
-                  exameList = exames
-                      .where("sintoma.$_segundoSintoma", isEqualTo: true)
-                      .where("sinais.$_sinal", isEqualTo: true);
-                } catch (_) {
-                  try {
-                    print("oitava Pesquisa");
-                    exameList = exames
-                        .where("sintoma.$_segundoSintoma", isEqualTo: true)
-                        .where("diagnostico.$_hipoteseDiagnostica",
-                            isEqualTo: true);
-                  } catch (_) {
-                    try {
-                      exameList = exames
-                          .where("sinais.$_sinal", isEqualTo: true)
-                          .where("diagnostico.$_hipoteseDiagnostica",
-                              isEqualTo: true);
-                    } catch (_) {
-                      try {
-                        print("nona Pesquisa");
-                        exameList = exames.where("sintoma.$_primeiroSintoma",
-                            isEqualTo: true);
-                      } catch (_) {
-                        try {
-                          print("decima Pesquisa");
-                          exameList = exames.where("sintoma.$_segundoSintoma",
-                              isEqualTo: true);
-                        } catch (_) {
-                          try {
-                            print("decima primeira Pesquisa");
-                            exameList =
-                                exames.where("sinais.$_sinal", isEqualTo: true);
-                          } catch (_) {
-                            try {
-                              print("decima segunda Pesquisa");
-                              exameList = exames.where(
-                                  "diagnostico.$_hipoteseDiagnostica",
-                                  isEqualTo: true);
-                            } catch (_) {}
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+    }else if(_primeiroSintoma.isNotEmpty&&_segundoSintoma.isNotEmpty
+        &&_sinal.isNotEmpty){
+      print("segunda Pesquisa");
+      exameList = exames
+          .where("sintoma.$_primeiroSintoma", isEqualTo: true)
+          .where("sintoma.$_segundoSintoma", isEqualTo: true)
+          .where("sinais.$_sinal", isEqualTo: true);
+
+    }else if(_primeiroSintoma.isNotEmpty&&_segundoSintoma.isNotEmpty
+        &&_hipoteseDiagnostica.isNotEmpty){
+      print("terceira Pesquisa");
+      exameList = exames
+          .where("sintoma.$_primeiroSintoma", isEqualTo: true)
+          .where("sintoma.$_segundoSintoma", isEqualTo: true)
+          .where("diagnostico.$_hipoteseDiagnostica", isEqualTo: true);
+    }else if(_primeiroSintoma.isNotEmpty&&_segundoSintoma.isNotEmpty){
+      print("quarta Pesquisa");
+      exameList = exames
+          .where("sintoma.$_primeiroSintoma", isEqualTo: true)
+          .where("sintoma.$_segundoSintoma", isEqualTo: true);
+    }else if(_primeiroSintoma.isNotEmpty&&_sinal.isNotEmpty){
+      print("quinta Pesquisa");
+      exameList = exames
+          .where("sintoma.$_primeiroSintoma", isEqualTo: true)
+          .where("sinais.$_sinal", isEqualTo: true);
+    }else if(_primeiroSintoma.isNotEmpty&&_hipoteseDiagnostica.isNotEmpty){
+      print("sexta Pesquisa");
+      exameList = exames
+          .where("sintoma.$_primeiroSintoma", isEqualTo: true)
+          .where("diagnostico.$_hipoteseDiagnostica",
+          isEqualTo: true);
+    }else if(_segundoSintoma.isNotEmpty&&_sinal.isNotEmpty){
+      print("setima Pesquisa");
+      exameList = exames
+          .where("sintoma.$_segundoSintoma", isEqualTo: true)
+          .where("sinais.$_sinal", isEqualTo: true);
+    }else if(_segundoSintoma.isNotEmpty&&_hipoteseDiagnostica.isNotEmpty){
+      print("oitava Pesquisa");
+      exameList = exames
+          .where("sintoma.$_segundoSintoma", isEqualTo: true)
+          .where("diagnostico.$_hipoteseDiagnostica",
+          isEqualTo: true);
+    }else if(_sinal.isNotEmpty&&_hipoteseDiagnostica.isNotEmpty){
+      exameList = exames
+          .where("sinais.$_sinal", isEqualTo: true)
+          .where("diagnostico.$_hipoteseDiagnostica",
+          isEqualTo: true);
+    }else if(_primeiroSintoma.isNotEmpty){
+      print("nona Pesquisa");
+      exameList = exames.where("sintoma.$_primeiroSintoma",
+          isEqualTo: true);
+    }else if(_segundoSintoma.isNotEmpty){
+      print("decima Pesquisa");
+      exameList = exames.where("sintoma.$_segundoSintoma",
+          isEqualTo: true);
+    }else if(_sinal.isNotEmpty){
+      print("decima primeira Pesquisa");
+      exameList =
+          exames.where("sinais.$_sinal", isEqualTo: true);
+    }else if(_hipoteseDiagnostica.isNotEmpty){
+      print("decima segunda Pesquisa");
+      exameList = exames.where(
+          "diagnostico.$_hipoteseDiagnostica",
+          isEqualTo: true);
     }
   }
 
