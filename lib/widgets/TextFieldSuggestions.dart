@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 class TextFieldSuggestions extends StatefulWidget {
   final List<String> list;
-  final TextEditingController controller;
-  final Function onChange;
   final Function returnedValue;
   final String labelText;
   final Color textSuggetionsColor;
@@ -12,8 +10,6 @@ class TextFieldSuggestions extends StatefulWidget {
   const TextFieldSuggestions(
       {Key key,
         this.list,
-        this.controller,
-        this.onChange,
         this.labelText,
         this.textSuggetionsColor,
         this.suggetionsBackgroundColor,
@@ -39,65 +35,87 @@ class _TextFieldSuggestionsState extends State<TextFieldSuggestions> {
   }
 
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(
-          left: MediaQuery.of(context).size.width * 0.2,
-          right: MediaQuery.of(context).size.width * 0.2),
-      child: Column(
-        children: [
-          TextField(
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: widget.labelText,
-              fillColor: widget.outlineInputBorderColor,
-            ),
-            scrollPadding: EdgeInsets.only(bottom: 100),
-            controller: widget.controller,
-            onChanged: widget.onChange,
-            onSubmitted: (String value) {
-              if (value != "") {
-                setState(() {
-                  widget.controller.text = captalize(widget.list[0]);
-                  widget.list.clear();
-                });
-                widget.returnedValue(widget.controller.text.toLowerCase());
-              } else {
-                setState(() {
-                  widget.controller.text = "";
-                });
-                widget.returnedValue(widget.controller.text);
+    return SingleChildScrollView(
+      child: Container(
+        margin: EdgeInsets.only(
+            left: MediaQuery.of(context).size.width * 0.2,
+            right: MediaQuery.of(context).size.width * 0.2),
+        child:RawAutocomplete<String>(
+          optionsBuilder: (TextEditingValue textEditingValue){
+            if(textEditingValue.isComposingRangeValid){
+              return widget.list.where((String option){
+                return option.contains(textEditingValue.text.toLowerCase());
               }
-            },
-          ),
-          widget.list.length == 0
-              ? Container()
-              : Container(
-            margin: EdgeInsets.only(top: 3),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                color: widget.suggetionsBackgroundColor),
-            child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: widget.list.length > 3 ? 3 : widget.list.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(captalize(widget.list[index]),
-                        style:
-                        TextStyle(color: widget.textSuggetionsColor)),
-                    onTap: () {
-                      setState(() {
-                        widget.controller.text =
-                            captalize(widget.list[index]);
-                        widget.list.clear();
-                      });
-                      widget.returnedValue(
-                          widget.controller.text.toLowerCase());
-                      FocusScope.of(context).unfocus();
-                    },
-                  );
-                }),
-          ),
-        ],
+              );
+            }else{
+              List<String> emptyList = [];
+              return emptyList;
+            }
+          },
+          fieldViewBuilder: (BuildContext context,
+              TextEditingController textEditingController,
+              FocusNode focusNode,
+              VoidCallback onFieldSubmitted
+              ){
+            return TextFormField(
+              controller: textEditingController,
+              focusNode: focusNode,
+              scrollPadding: EdgeInsets.only(bottom:200 ),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: widget.labelText,
+                fillColor: widget.outlineInputBorderColor,
+              ),
+              onFieldSubmitted: (String value){
+                if(value.isNotEmpty){
+                  onFieldSubmitted();
+                  widget.returnedValue(textEditingController.text);
+                }
+              },
+
+            );
+          },
+          optionsViewBuilder: (BuildContext context,
+              AutocompleteOnSelected<String>onSelected, Iterable<String> options){
+            return Container(
+              margin: EdgeInsets.only(top: 2,
+                  right: MediaQuery.of(context).size.width * 0.4),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Material(
+                  elevation: 2,
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(5),
+                  child: SizedBox(
+                    height: options.length == 1 ? 85 : options.length == 2? 150 :200,
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: options.length,
+                        itemBuilder: (BuildContext context, int index){
+                          final String option = options.elementAt(index);
+                          return GestureDetector(
+                            onTap: (){
+                              onSelected(option);
+                              widget.returnedValue(option);
+                              FocusScope.of(context).unfocus();
+                            },
+                            child: ListTile(
+                              title: Text(
+                                captalize(option),
+                                maxLines: 2,
+                                style:
+                                TextStyle(color: widget.textSuggetionsColor),
+                              ),
+                            ),
+                          );
+                        }
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

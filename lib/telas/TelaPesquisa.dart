@@ -1,11 +1,8 @@
-import 'dart:ui';
 
-//import 'package:app_radiologia/FirestoreConn.dart';
 import 'package:app_radiologia/model/Exame.dart';
 import 'package:app_radiologia/widgets/CustomAlertDialog.dart';
 import 'package:app_radiologia/widgets/TextFieldSuggestions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'PagExame.dart';
@@ -19,39 +16,35 @@ class TelaPesquisa extends StatefulWidget {
 
 class _TelaPesquisaState extends State<TelaPesquisa> {
   QuerySnapshot querySnapshot;
+  List<String> symptoms = [];
   String _hintSintoma = "Escolha um sintoma";
-
   CollectionReference sintomas;
 
-  TextEditingController _primeiroSintomaController = TextEditingController();
+
   CollectionReference primeiroSintomas;
   String _primeiroSintoma = "";
-  List<String> _listaSintomaPrincipal = [];
 
-  TextEditingController _segundoSintomaController = TextEditingController();
+
   CollectionReference segundoSintomas;
   String _segundoSintoma = "";
-  List<String> _listaSintomaSecundario = [];
 
-  TextEditingController _sinalController = TextEditingController();
+
+
   CollectionReference sinais;
   String _sinal = "";
-  List<String> _listaSinais = [];
   String _hintSinal = "Escolha um sinal";
+  List<String> signal = [];
 
-  TextEditingController _diagnosticoController = TextEditingController();
   CollectionReference diagnosticos;
   String _hipoteseDiagnostica = "";
-  List<String> _listaDiagnosticos = [];
   String _hintDiagnostico = "Hipotese Diagnostica";
+  List<String> diagnosis= [];
 
   Query exameList;
   CollectionReference exames;
   Query listTeste;
   List<Exame> exList = [];
 
-  //FirestoreConn firestoreConn = FirestoreConn();
-  //FirebaseFirestore db = FirebaseFirestore.instance;
 
   message(String text) {
     final snackBar = SnackBar(
@@ -191,13 +184,15 @@ class _TelaPesquisaState extends State<TelaPesquisa> {
     }
   }
 
-  funcao(Function f) async {
-    QuerySnapshot qS = await listTeste.get();
+  makeList(Function f, CollectionReference collectionReference) async {
+    QuerySnapshot qS = await collectionReference.get();
     for (DocumentSnapshot ex in qS.docs) {
       var dado = ex;
       f(dado);
     }
+
   }
+
 
 //-------------------------------------------------------------------------------
   @override
@@ -208,22 +203,25 @@ class _TelaPesquisaState extends State<TelaPesquisa> {
     sinais = FirebaseFirestore.instance.collection("sinais");
     sintomas = FirebaseFirestore.instance.collection("sintomas");
     diagnosticos = FirebaseFirestore.instance.collection("hipoteseDiagnostica");
-    primeiroSintomas =
-        FirebaseFirestore.instance.collection("sintomaPrincipal");
-    segundoSintomas =
-        FirebaseFirestore.instance.collection("sintomaSecundario");
 
+    makeList((dado){
+      setState(() {
+        symptoms.add(dado["sintoma"]);
+      });
+    },sintomas);
+    makeList((dado){
+      setState(() {
+        signal.add(dado["sinal"]);
+      });
+    },sinais);
+    makeList((dado){
+      setState(() {
+        diagnosis.add(dado["diagnostico"]);
+      });
+    },diagnosticos);
     //  ----------------
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    _primeiroSintomaController.dispose();
-    _segundoSintomaController.dispose();
-    _sinalController.dispose();
-    _diagnosticoController.dispose();
-  }
 
   //------------------------------------------------------------------------
 
@@ -242,147 +240,46 @@ class _TelaPesquisaState extends State<TelaPesquisa> {
             ),
           ),
           TextFieldSuggestions(
-            controller: _primeiroSintomaController,
-            list: _listaSintomaPrincipal,
+            list: symptoms,
             labelText: _hintSintoma,
             textSuggetionsColor: Colors.white,
             outlineInputBorderColor: Colors.blue,
             suggetionsBackgroundColor: Colors.blue,
             returnedValue: (String value) => _primeiroSintoma = value,
-            onChange: (String value) {
-              if (value == "") {
-                setState(() {
-                  _listaSintomaPrincipal = [];
-                  _primeiroSintoma = "";
-                });
-              } else {
-                setState(() {
-                  _listaSintomaPrincipal = [];
-                });
-                String texto = value.toLowerCase();
-                listTeste = sintomas
-                    .where("sintoma", isGreaterThanOrEqualTo: texto)
-                    .where("sintoma", isLessThanOrEqualTo: texto + "\uf8ff");
 
-                funcao((DocumentSnapshot dado) {
-                  setState(() {
-                    print(dado["sintoma"]);
-                    if (!_listaSintomaPrincipal.contains(dado["sintoma"])) {
-                      _listaSintomaPrincipal.add(dado["sintoma"]);
-                    }
-                  });
-                });
-              }
-            },
           ),
           SizedBox(
             height: 20,
           ),
           TextFieldSuggestions(
-            controller: _segundoSintomaController,
-            list: _listaSintomaSecundario,
+            list: symptoms,
             labelText: _hintSintoma,
             textSuggetionsColor: Colors.white,
             outlineInputBorderColor: Colors.blue,
             suggetionsBackgroundColor: Colors.blue,
             returnedValue: (String value) => _segundoSintoma = value,
-            onChange: (String value) {
-              if (value == "") {
-                setState(() {
-                  _listaSintomaSecundario = [];
-                  _segundoSintoma = "";
-                });
-              } else {
-                setState(() {
-                  _listaSintomaSecundario = [];
-                });
-                String texto = value.toLowerCase();
-                listTeste = sintomas
-                    .where("sintoma", isGreaterThanOrEqualTo: texto)
-                    .where("sintoma", isLessThanOrEqualTo: texto + "\uf8ff");
-                funcao((DocumentSnapshot dado) {
-                  setState(() {
-                    print(dado["sintoma"]);
-                    if (!_listaSintomaSecundario.contains(dado["sintoma"])) {
-                      _listaSintomaSecundario.add(dado["sintoma"]);
-                    }
-                  });
-                });
-              }
-            },
           ),
           SizedBox(
             height: 20,
           ),
           TextFieldSuggestions(
-            controller: _sinalController,
-            list: _listaSinais,
+            list: signal,
             labelText: _hintSinal,
             textSuggetionsColor: Colors.white,
             outlineInputBorderColor: Colors.blue,
             suggetionsBackgroundColor: Colors.blue,
             returnedValue: (String value) => _sinal = value,
-            onChange: (String value) {
-              if (value == "") {
-                setState(() {
-                  _listaSinais = [];
-                  _sinal = "";
-                });
-              } else {
-                setState(() {
-                  _listaSinais = [];
-                });
-                String texto = value.toLowerCase();
-                listTeste = sinais
-                    .where("sinal", isGreaterThanOrEqualTo: texto)
-                    .where("sinal", isLessThanOrEqualTo: texto + "\uf8ff");
-                funcao((DocumentSnapshot dado) {
-                  setState(() {
-                    print(dado["sinal"]);
-                    if (!_listaSinais.contains(dado["sinal"])) {
-                      _listaSinais.add(dado["sinal"]);
-                    }
-                  });
-                });
-              }
-            },
           ),
           SizedBox(
             height: 20,
           ),
           TextFieldSuggestions(
-            controller: _diagnosticoController,
-            list: _listaDiagnosticos,
+            list: diagnosis,
             labelText: _hintDiagnostico,
             textSuggetionsColor: Colors.white,
             outlineInputBorderColor: Colors.blue,
             suggetionsBackgroundColor: Colors.blue,
             returnedValue: (String value) => _hipoteseDiagnostica = value,
-            onChange: (String value) {
-              if (value == "") {
-                setState(() {
-                  _listaDiagnosticos = [];
-                  _hipoteseDiagnostica = "";
-                });
-              } else {
-                setState(() {
-                  _listaDiagnosticos = [];
-                });
-                String texto = value.toLowerCase();
-                listTeste = diagnosticos
-                    .where("diagnostico", isGreaterThanOrEqualTo: texto)
-                    .where("diagnostico",
-                        isLessThanOrEqualTo: texto + "\uf8ff");
-                funcao((DocumentSnapshot dado) {
-                  setState(() {
-                    print(dado["diagnostico"]);
-                    if (!_listaDiagnosticos.contains(dado["diagnostico"])) {
-                      _listaDiagnosticos.add(dado["diagnostico"]);
-                    }
-                  });
-                });
-              }
-            },
           ),
           SizedBox(
             height: 20,
